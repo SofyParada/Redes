@@ -40,6 +40,31 @@ func main() {
         data := string(buffer[:n])
         fmt.Printf("Datos recibidos de %s: %s\n", addr, data)
 
+        print(data)
+        if data == "b'1'"{
+            Mensaje := "OK"
+            MensajeBytes := []byte(Mensaje)
+            _, err = conn.WriteToUDP(MensajeBytes, addr)
+            if err != nil {
+                fmt.Println("Error al enviar datos al servidor:", err)
+                continue
+            }
+            fmt.Printf("Datos enviados al servidor: %s\n", Mensaje)
+
+
+        }else{
+            Mensaje := "NO"
+            MensajeBytes := []byte(Mensaje)
+            _, err = conn.WriteToUDP(MensajeBytes, addr)
+            if err != nil {
+                fmt.Println("Error al enviar datos al servidor:", err)
+                continue
+            }
+            fmt.Printf("Datos enviados al servidor: %s\n", Mensaje)
+
+        }
+
+
         // Rutina del cliente para enviar datos
         message := "¡Hola, servidor de python!"
     
@@ -53,3 +78,7 @@ func main() {
         fmt.Printf("Datos enviados al servidor: %s\n", message)   
     }
     
+    
+
+    
+}
