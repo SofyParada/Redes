@@ -3,37 +3,53 @@ package main
 import (
     "fmt"
     "net"
+    "os"
 )
 
 func main() {
     // Dirección en la que el servidor Go escuchará
-    serverAddr, err := net.ResolveUDPAddr("udp", "192.168.0.8:8000")
+    serverAddr, err := net.ResolveUDPAddr("udp", "0.0.0.0:1234")
     if err != nil {
         fmt.Println("Error al resolver la dirección del servidor:", err)
-        return
+        os.Exit(1)
+        
     }
 
     // Crear una conexión UDP
-    conexion, err := net.ListenUDP("udp", serverAddr)
+    conn, err := net.ListenUDP("udp", serverAddr)
     if err != nil {
         fmt.Println("Error al crear la conexión UDP:", err)
-        return
+        os.Exit(1)
     }
-    defer conexion.Close()
+    defer conn.Close()
 
-    fmt.Println("Servidor Go escuchando en 192.168.0.8:8000")
+    fmt.Println("Servidor Go escuchando en 0.0.0.0:1234")
 
+
+    
+    buffer := make([]byte, 1024)
     for {
         // Leer datos del servidor Python
-        buffer := make([]byte, 1024)
-        _, addr, err := conexion.ReadFromUDP(buffer)
+        n, addr, err := conn.ReadFromUDP(buffer)
         if err != nil {
             fmt.Println("Error al leer datos del servidor Python:", err)
-            return
+            continue
         }
 
         // Procesar y mostrar los datos recibidos
-        data := string(buffer)
+        data := string(buffer[:n])
         fmt.Printf("Datos recibidos de %s: %s\n", addr, data)
+
+        // Rutina del cliente para enviar datos
+        message := "¡Hola, servidor de python!"
+    
+        messageBytes := []byte(message)
+    
+        _, err = conn.WriteToUDP(messageBytes, addr)
+        if err != nil {
+            fmt.Println("Error al enviar datos al servidor:", err)
+            continue
+        }
+        fmt.Printf("Datos enviados al servidor: %s\n", message)   
     }
-}
+    
