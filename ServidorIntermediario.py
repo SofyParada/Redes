@@ -14,10 +14,25 @@ while True:
     print("Nueva conexion establecida")
     print(addr)
     
-    peticion = conexion.recv(1024)
+    peticion = str(conexion.recv(1024))
     print(peticion)
     
+    mi_socket2.sendto(peticion.encode('utf-8'), ('127.0.0.1', 1234))
     
+    data, address = mi_socket2.recvfrom(1024)
+    print(f"Mensaje recibido de {address}: {data.decode('utf-8')}")
+    
+    Mensaje = str(data.decode('utf-8'))
+    Mensaje_bytes = Mensaje.encode('utf-8')
+    conexion.send(Mensaje_bytes)
+    
+    conexion.close()
+    mi_socket2.close()
+    mi_socket.close()
+    
+    
+    
+'''   
     mensaje = "Hola, te saludo desde el servidor!"
     mensaje_bytes = mensaje.encode('utf-8')
     conexion.send(mensaje_bytes)
@@ -31,6 +46,9 @@ while True:
     
     conexion.close()
     mi_socket2.close()
+'''
+    
+
     
 
     
