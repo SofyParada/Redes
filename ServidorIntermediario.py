@@ -1,6 +1,5 @@
 import socket
 import numpy as np
-import ast
 
 mi_socket = socket.socket()
 mi_socket2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -27,39 +26,16 @@ while True:
     Mensaje_bytes = Mensaje.encode('utf-8')
     conexion.send(Mensaje_bytes)
     print("Mensaje enviado al cliente: ", Mensaje)
-        
-    tablero_bytes= conexion.recv(1024)
-    tablero = tablero_bytes.decode('utf-16le')
-    print({tablero})
-     
-    tablero = tablero[:6 * 6] #chatgpt jiji
-    tablero = np.array(list(tablero)).reshape(6, 6)
     
-    
-    #tablero = [tablero1,tablero2,tablero3,tablero4,tablero5,tablero6]
-    
-    '''
-    tablero1 = np.fromstring((tablero[:6]), dtype=str, sep='')
-    tablero2 = np.fromstring((tablero[6:11]), dtype=str, sep='')
-    tablero3 = np.fromstring((tablero[11:16]), dtype=str, sep='')
-    tablero4 = np.fromstring((tablero[16:21]), dtype=str, sep='')
-    tablero5 = np.fromstring((tablero[21:26]), dtype=str, sep='')
-    tablero6 = np.fromstring((tablero[26:]), dtype=str, sep='')
-    
-    tablero = np.array([tablero1, tablero2,tablero3, tablero4, tablero5, tablero6])
-    '''
-   
-    
-    
-    print(tablero)
+
     
     
 
         
     
     conexion.close()
-    mi_socket2.close()
-    mi_socket.close()
+    #mi_socket2.close()
+    #mi_socket.close()
     
     
     
@@ -80,3 +56,4 @@ while True:
 '''
     
 
+    
