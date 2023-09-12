@@ -77,4 +77,8 @@ func main() {
         //}
         //fmt.Printf("Datos enviados al servidor: %s\n", message)   
     }
+    
+    
+
+    
 }
