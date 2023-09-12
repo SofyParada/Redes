@@ -29,13 +29,14 @@ if Seleccion == '1': #arreglar los if por ok y no
     
     #while
     
-    fila = 5
+    
     columna = 0
     flag = False
     #jugada = input("En que columna quieres colocar la fila: ")
     
-    while flag == False:
-        jugada = input("En que columna quieres colocar la fila: ")
+    while flag == False: #dolicitar la jugada al cliente 
+        fila = 5
+        jugada = input("En que columna quieres colocar la columna: ")
         if jugada == '1':
             
             while tablero[fila][0] != '0' and fila >= 0:
@@ -43,6 +44,7 @@ if Seleccion == '1': #arreglar los if por ok y no
             if fila >= 0:
                 tablero[fila][0] = 'A'
                 flag = True
+                
             else:
                 print("Esta columna esta completa de filas, eliga otra: ")
                 Flag = False
@@ -100,12 +102,20 @@ if Seleccion == '1': #arreglar los if por ok y no
             else:
                 print("Esta columna esta completa de fillas, eliga otra: ")
                 flag = False
+                
+        else:
+            print("Este numero no esta dentro del rango de la tabla, porfavor elija otra")
+            flag = False
     
+    #solicitar jugada al BOT
+    fila_str = str(fila)
+    fila_bytes = fila_str.encode('utf-8')
+    mi_socket.send(fila_bytes)
     
+    columnaAleBOT = mi_socket.recv(1024)
+    print(columnaAleBOT)
 
-    tablero_bytes = tablero.tobytes()
-    mi_socket.send(tablero_bytes)
-        
+    
     
     
     
