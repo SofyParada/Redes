@@ -1,17 +1,18 @@
 import socket
 import numpy as np
+import pickle
 
 mi_socket = socket.socket()
 mi_socket.connect( (socket.gethostname(), 8000) )
 
 print("- - - - - - - - Bienvenido al Juego - - - - - - - -")
 Seleccion =input("- Seleccione una opción\n1-Jugar\n2-Salir\n")
+
 if Seleccion == '1': #arreglar los if por ok y no
     Seleccion_bytes = Seleccion.encode('utf-8')
     mi_socket.send(Seleccion_bytes)
     
-    respuesta = mi_socket.recv(1024)
-    print("Respuesta de disponibilidad: ", respuesta,"\n")
+
     print("- - - - - - - - Comienza el Juego - - - - - - - -")
     
     tablero = np.array([['0','0','0','0','0','0'], 
@@ -28,104 +29,119 @@ if Seleccion == '1': #arreglar los if por ok y no
     
     
     #while
-    
-    
     columna = 0
     flag = False
-    #jugada = input("En que columna quieres colocar la fila: ")
-    
-    while flag == False: #dolicitar la jugada al cliente 
-        fila = 5
-        jugada = input("En que columna quieres colocar la columna: ")
-        if jugada == '1':
-            
-            while tablero[fila][0] != '0' and fila >= 0:
-                fila -= 1
-            if fila >= 0:
-                tablero[fila][0] = 'A'
-                flag = True
-                
-            else:
-                print("Esta columna esta completa de filas, eliga otra: ")
-                Flag = False
-            
-        elif jugada == '2':
-            while tablero[fila][1] != '0' and fila >= 0:
-                fila -= 1
-            if fila >= 0:
-                tablero[fila][1] = 'A'
-                flag = True
-            else:
-                print("Esta columna esta completa de fillas, eliga otra: ")
-                flag = False
-            
-        elif jugada == '3':
-            while tablero[fila][2] != '0' and fila >= 0:
-                fila -= 1
-                
-            if fila >= 0:
-                tablero[fila][2] = 'A'
-                flag = True
-            else:
-                print("Esta columna esta completa de fillas, eliga otra: ")
-                flag = False
-            
-        elif jugada == '4':
-            while tablero[fila][3] != '0' and fila >= 0:
-                fila -= 1
-                
-            if fila >= 0:
-                tablero[fila][3] = 'A'
-                flag = True
-            else:
-                print("Esta columna esta completa de fillas, eliga otra: ")
-                flag = False
-            
-        elif jugada == '5':
-            while tablero[fila][4] != '0' and fila >= 0:
-                fila -= 1
-                
-            if fila >= 0:
-                tablero[fila][4] = 'A'
-                flag = True
-            else:
-                print("Esta columna esta completa de fillas, eliga otra: ")
-                flag = False
-            
-        elif jugada == '6':
-            while tablero[fila][5] != '0' and fila >= 0:
-                fila -= 1
-                
-            if fila >= 0:
-                tablero[fila][5] = 'A'
-                flag = True
-            else:
-                print("Esta columna esta completa de fillas, eliga otra: ")
-                flag = False
-                
-        else:
-            print("Este numero no esta dentro del rango de la tabla, porfavor elija otra")
-            flag = False
-    
-    #solicitar jugada al BOT
-    fila_str = str(fila)
-    fila_bytes = fila_str.encode('utf-8')
-    mi_socket.send(fila_bytes)
-    
-    columnaAleBOT = mi_socket.recv(1024)
-    print(columnaAleBOT)
 
+    while flag == False:
+
+        while flag == False:
+            fila = 5
+            jugada = input("En que columna quieres colocar la columna: ")
+            if jugada == '1':
+                
+                while tablero[fila][0] != '0' and fila >= 0:
+                    fila -= 1
+                if fila >= 0:
+                    tablero[fila][0] = 'A'
+                    flag = True
+                    
+                else:
+                    print("Esta columna esta completa de filas, eliga otra: ")
+                    Flag = False
+                
+            elif jugada == '2':
+                while tablero[fila][1] != '0' and fila >= 0:
+                    fila -= 1
+                if fila >= 0:
+                    tablero[fila][1] = 'A'
+                    flag = True
+                else:
+                    print("Esta columna esta completa de fillas, eliga otra: ")
+                    flag = False
+                
+            elif jugada == '3':
+                while tablero[fila][2] != '0' and fila >= 0:
+                    fila -= 1
+                    
+                if fila >= 0:
+                    tablero[fila][2] = 'A'
+                    flag = True
+                else:
+                    print("Esta columna esta completa de fillas, eliga otra: ")
+                    flag = False
+                
+            elif jugada == '4':
+                while tablero[fila][3] != '0' and fila >= 0:
+                    fila -= 1
+                    
+                if fila >= 0:
+                    tablero[fila][3] = 'A'
+                    flag = True
+                else:
+                    print("Esta columna esta completa de fillas, eliga otra: ")
+                    flag = False
+                
+            elif jugada == '5':
+                while tablero[fila][4] != '0' and fila >= 0:
+                    fila -= 1
+                    
+                if fila >= 0:
+                    tablero[fila][4] = 'A'
+                    flag = True
+                else:
+                    print("Esta columna esta completa de fillas, eliga otra: ")
+                    flag = False
+                
+            elif jugada == '6':
+                while tablero[fila][5] != '0' and fila >= 0:
+                    fila -= 1
+                    
+                if fila >= 0:
+                    tablero[fila][5] = 'A'
+                    flag = True
+                else:
+                    print("Esta columna esta completa de fillas, eliga otra: ")
+                    flag = False
+                    
+            else:
+                print("Este numero no esta dentro del rango de la tabla, porfavor elija otra")
+                flag = False
+        
+
+        fila_str = str(jugada)
+        fila_bytes = fila_str.encode('utf-8')  #Jugador manda fila a intermediario
+        mi_socket.send(fila_bytes)
+        
+
+        tablero_bytes = (mi_socket.recv(4096))  #Cliente recibe tablero actualizado
+        newtablero = pickle.loads(tablero_bytes)
+        
+        print("El nuevo tablero es:\n")
+        print(newtablero)
+
+        if flag == True:
+            Continue = input("Quiere seguir jugando? Si/No\n")
+            if Continue == "Si" or Continue == "si":
+                flag = False
+            if Continue == "No" or Continue == "no":
+                break
+
+    if flag == True:
+        End = "cerrar"
+        End_bytes = End.encode('utf-8')
+        mi_socket.send(End_bytes)
+        mi_socket.close()
     
     
     
-    
-else:
+if Seleccion == "cerrar":
     
     Seleccion_bytes = Seleccion.encode('utf-8')
     mi_socket.send(Seleccion_bytes)
     
     respuesta = str(mi_socket.recv(1024))
-    print("Respuesta de disponibilidad: ", respuesta)    
+    print("Respuesta de disponibilidad: ", respuesta)
+    mi_socket.close()    
 
 '''
 mensaje = "Hola, te saludo desde el cliente!"
