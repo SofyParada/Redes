@@ -26,7 +26,8 @@ while True:
         print("Mensaje enviado al Servidor Conecta 4: ",peticion)
 
         if peticion == '2':
-            print("no entro caca")
+            mensaje = "cerrar"
+            mi_socket2.sendto(mensaje.encode('utf-8'), ('127.0.0.1', 1234))
             conexion.close()
             mi_socket.close()
             mi_socket2.close()
@@ -43,6 +44,7 @@ while True:
     print("Esperando segunda peticion")
     peticion2 = conexion.recv(1024)
     jugada = peticion2.decode('utf-8')
+    
 
     
 
@@ -93,11 +95,26 @@ while True:
             print("Entro en 6")
             tablero[fila][5] = 'A'
 
-    #Buscar puerto del go wtf
-    puerto = mi_socket2.recv(1024).decode('utf-8')
+    
+
+    #Puerto dinamico
+    puerto = mi_socket2.recv(1024).decode('utf-8')  #Recibo puerto del go
     print(f"Mensaje recibido de conecta4 {address}: {data.decode('utf-8')}")
     print("Puerto a usar: "+puerto)
 
+    if jugada == "cerrar": #En caso de no querer continuar el juego
+        socketDinamico = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        socketDinamico.connect(('127.0.0.1', int(puerto)))
+        socketDinamico.send(jugada.encode('utf-8'))
+        print("Mensaje enviado al servidor conecta 4: ",jugada)
+
+        socketDinamico.close()
+        conexion.close()
+        mi_socket2.close()
+        mi_socket.close()
+        break
+
+        
     #Abrimos socket con puerto dinamico
 
     socketDinamico = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -119,7 +136,7 @@ while True:
     ##Incorpora ficha del bot a el tablero
     fila = 5
 
-    if jugadago== '1':
+    if jugadago== '0':
         
         while tablero[fila][0] != '0' and fila >= 0:
             fila -= 1
@@ -127,14 +144,14 @@ while True:
             print("Entro en 1")
             tablero[fila][0] = 'M'
             
-    elif jugadago == '2':
+    elif jugadago == '1':
         while tablero[fila][1] != '0' and fila >= 0:
             fila -= 1
         if fila >= 0:
             print("Entro en 2")
             tablero[fila][1] = 'M'
         
-    elif jugadago == '3':
+    elif jugadago == '2':
         while tablero[fila][2] != '0' and fila >= 0:
             fila -= 1
             
@@ -142,7 +159,7 @@ while True:
             print("Entro en 3")
             tablero[fila][2] = 'M'
         
-    elif jugadago == '4':
+    elif jugadago == '3':
         while tablero[fila][3] != '0' and fila >= 0:
             fila -= 1
             
@@ -150,7 +167,7 @@ while True:
             print("Entro en 4")
             tablero[fila][3] = 'M'
         
-    elif jugadago == '5':
+    elif jugadago == '4':
         while tablero[fila][4] != '0' and fila >= 0:
             fila -= 1
             
@@ -158,7 +175,7 @@ while True:
             print("Entro en 5")
             tablero[fila][4] = 'M'
 
-    elif jugadago == '6':
+    elif jugadago == '5':
         while tablero[fila][5] != '0' and fila >= 0:
             fila -= 1
             
@@ -170,14 +187,8 @@ while True:
     print(tablero)
 
     tablero_bytes = pickle.dumps(tablero)
-    conexion.send(tablero_bytes)
+    conexion.send(tablero_bytes)  #Mandamos tablero actualizado al cliente
     print("Mensaje enviado al cliente:")
-    
-    if peticion == "cerrar":
-        conexion.close()
-        mi_socket2.close()
-        mi_socket.close()
-        break
 
     
     
