@@ -15,6 +15,39 @@ tablero = np.array([['0','0','0','0','0','0'],
                ['0','0','0','0','0','0'],
                ['0','0','0','0','0','0']])
 
+win = False
+
+
+import numpy as np
+
+def check_win(board, player):
+    # Check for horizontal wins
+    for row in range(board.shape[0]):
+        for col in range(board.shape[1] - 3):
+            if all(board[row, col + i] == player for i in range(4)):
+                return True
+
+    # Check for vertical wins
+    for col in range(board.shape[1]):
+        for row in range(board.shape[0] - 3):
+            if all(board[row + i, col] == player for i in range(4)):
+                return True
+
+    # Check for diagonal wins (from top-left to bottom-right)
+    for row in range(board.shape[0] - 3):
+        for col in range(board.shape[1] - 3):
+            if all(board[row + i, col + i] == player for i in range(4)):
+                return True
+
+    # Check for diagonal wins (from top-right to bottom-left)
+    for row in range(board.shape[0] - 3):
+        for col in range(3, board.shape[1]):
+            if all(board[row + i, col - i] == player for i in range(4)):
+                return True
+
+    return False
+
+
 while True:
     if flag == False:
         conexion, addr = mi_socket.accept()
@@ -41,7 +74,6 @@ while True:
 
     #Reemplaza valor del cliente en tablero
     fila = 5
-    print("Esperando segunda peticion")
     peticion2 = conexion.recv(1024)
     jugada = peticion2.decode('utf-8')
     
@@ -53,14 +85,12 @@ while True:
         while tablero[fila][0] != '0' and fila >= 0:
             fila -= 1
         if fila >= 0:
-            print("Entro en 1")
             tablero[fila][0] = 'A'
             
     elif jugada == '2':
         while tablero[fila][1] != '0' and fila >= 0:
             fila -= 1
         if fila >= 0:
-            print("Entro en 2")
             tablero[fila][1] = 'A'
         
     elif jugada == '3':
@@ -68,7 +98,6 @@ while True:
             fila -= 1
             
         if fila >= 0:
-            print("Entro en 3")
             tablero[fila][2] = 'A'
         
     elif jugada == '4':
@@ -76,7 +105,6 @@ while True:
             fila -= 1
             
         if fila >= 0:
-            print("Entro en 4")
             tablero[fila][3] = 'A'
         
     elif jugada == '5':
@@ -84,7 +112,6 @@ while True:
             fila -= 1
             
         if fila >= 0:
-            print("Entro en 5")
             tablero[fila][4] = 'A'
 
     elif jugada == '6':
@@ -92,8 +119,14 @@ while True:
             fila -= 1
             
         if fila >= 0:
-            print("Entro en 6")
             tablero[fila][5] = 'A'
+    
+
+
+    if check_win(tablero, 'A'):
+        print("Gana cliente")
+        mensaje = '3'
+        win = True
 
     
 
@@ -135,62 +168,100 @@ while True:
 
     ##Incorpora ficha del bot a el tablero
     fila = 5
+    if win == False:
+        if jugadago== '0':
+            
+            while tablero[fila][0] != '0' and fila >= 0:
+                fila -= 1
+            if fila >= 0:
+                tablero[fila][0] = 'M'
+                
+        elif jugadago == '1':
+            while tablero[fila][1] != '0' and fila >= 0:
+                fila -= 1
+            if fila >= 0:
+                tablero[fila][1] = 'M'
+            
+        elif jugadago == '2':
+            while tablero[fila][2] != '0' and fila >= 0:
+                fila -= 1
+                
+            if fila >= 0:
+                tablero[fila][2] = 'M'
+            
+        elif jugadago == '3':
+            while tablero[fila][3] != '0' and fila >= 0:
+                fila -= 1
+                
+            if fila >= 0:
+                tablero[fila][3] = 'M'
+            
+        elif jugadago == '4':
+            while tablero[fila][4] != '0' and fila >= 0:
+                fila -= 1
+                
+            if fila >= 0:
+                tablero[fila][4] = 'M'
 
-    if jugadago== '0':
-        
-        while tablero[fila][0] != '0' and fila >= 0:
-            fila -= 1
-        if fila >= 0:
-            print("Entro en 1")
-            tablero[fila][0] = 'M'
-            
-    elif jugadago == '1':
-        while tablero[fila][1] != '0' and fila >= 0:
-            fila -= 1
-        if fila >= 0:
-            print("Entro en 2")
-            tablero[fila][1] = 'M'
-        
-    elif jugadago == '2':
-        while tablero[fila][2] != '0' and fila >= 0:
-            fila -= 1
-            
-        if fila >= 0:
-            print("Entro en 3")
-            tablero[fila][2] = 'M'
-        
-    elif jugadago == '3':
-        while tablero[fila][3] != '0' and fila >= 0:
-            fila -= 1
-            
-        if fila >= 0:
-            print("Entro en 4")
-            tablero[fila][3] = 'M'
-        
-    elif jugadago == '4':
-        while tablero[fila][4] != '0' and fila >= 0:
-            fila -= 1
-            
-        if fila >= 0:
-            print("Entro en 5")
-            tablero[fila][4] = 'M'
-
-    elif jugadago == '5':
-        while tablero[fila][5] != '0' and fila >= 0:
-            fila -= 1
-            
-        if fila >= 0:
-            print("Entro en 6")
-            tablero[fila][5] = 'M'
+        elif jugadago == '5':
+            while tablero[fila][5] != '0' and fila >= 0:
+                fila -= 1
+                
+            if fila >= 0:
+                tablero[fila][5] = 'M'
 
 
     print(tablero)
 
     tablero_bytes = pickle.dumps(tablero)
     conexion.send(tablero_bytes)  #Mandamos tablero actualizado al cliente
-    print("Mensaje enviado al cliente:")
+    print("Tablero enviado al cliente")
+    
+
+    #Checkeamos ganador
+    if win == True:
+        mensaje = '3'
+        conexion.send(mensaje.encode('utf-8'))
+        jugada = "cerrar"
+        puerto = mi_socket2.recv(1024).decode('utf-8')  #Recibo puerto del go
+        print("Puerto a usar para enviar mensaje es:"+puerto)
+        socketDinamico = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        socketDinamico.connect(('127.0.0.1', int(puerto)))
+        socketDinamico.send(jugada.encode('utf-8'))
+        print("Mensaje enviado al servidor conecta 4: ",jugada)
+
+        socketDinamico.close()
+        conexion.close()
+        mi_socket2.close()
+        mi_socket.close()
+        break
+
 
     
+    if check_win(tablero, 'M'):
+        print("Gana bot")
+        mensaje = '4'
+        conexion.send(mensaje.encode('utf-8'))
+        jugada = "cerrar"
+        puerto = mi_socket2.recv(1024).decode('utf-8')  #Recibo puerto del go
+        print("Puerto a usar para enviar mensaje es:"+puerto)
+        socketDinamico = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        socketDinamico.connect(('127.0.0.1', int(puerto)))
+        socketDinamico.send(jugada.encode('utf-8'))
+        print("Mensaje enviado al servidor conecta 4: ",jugada)
+
+        socketDinamico.close()
+        conexion.close()
+        mi_socket2.close()
+        mi_socket.close()
+
+        break
+
+    else:
+        mensaje = '5'
+        conexion.send(mensaje.encode('utf-8'))
+
+
     
 
     
