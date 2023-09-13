@@ -36,7 +36,7 @@ if Seleccion == '1': #arreglar los if por ok y no
 
         while flag == False:
             fila = 5
-            jugada = input("En que columna quieres colocar la columna: ")
+            jugada = input("En que columna quieres color tu ficha: ")
             if jugada == '1':
                 
                 while tablero[fila][0] != '0' and fila >= 0:
@@ -119,12 +119,33 @@ if Seleccion == '1': #arreglar los if por ok y no
         print("El nuevo tablero es:\n")
         print(newtablero)
 
-        if flag == True:
+        mensaje = mi_socket.recv(1024).decode('utf-8')
+
+        if mensaje == '3':
+            print("Termina el juego, gana el cliente")
+            End = "cerrar"
+            End_bytes = End.encode('utf-8')
+            mi_socket.close()
+            flag = False
+            break
+
+
+        if mensaje == '4':
+            print("Termina el juego, gana el bot")
+            End = "cerrar"
+            End_bytes = End.encode('utf-8')
+            mi_socket.close()
+            flag = False
+            break
+
+        while flag == True:
             Continue = input("Quiere seguir jugando? Si/No\n")
             if Continue == "Si" or Continue == "si":
                 flag = False
             if Continue == "No" or Continue == "no":
+                Seleccion = "cerrar"
                 break
+            
 
     if flag == True:
         End = "cerrar"
