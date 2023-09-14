@@ -9,47 +9,67 @@ mi_socket.listen(5)
 conexion = socket.socket()
 flag = False
 tablero = np.array([['0','0','0','0','0','0'], 
-               ['0','0','0','0','0','0'], 
-               ['0','0','0','0','0','0'],
-               ['0','0','0','0','0','0'],
-               ['0','0','0','0','0','0'],
-               ['0','0','0','0','0','0']])
+                    ['0','0','0','0','0','0'], 
+                    ['0','0','0','0','0','0'],
+                    ['0','0','0','0','0','0'],
+                    ['0','0','0','0','0','0'],
+                    ['0','0','0','0','0','0']])
 
 win = False
+draw = False
 
 
 import numpy as np
 
-def check_win(board, player):
-    # Check for horizontal wins
-    for row in range(board.shape[0]):
-        for col in range(board.shape[1] - 3):
-            if all(board[row, col + i] == player for i in range(4)):
+'''
+Funcion ganar
+Retorna True si encuentra 4 seguidos o False si no,
+Busca usando 4 metodos distintos que el simbolo de jugador se repita 4 veces seguidas en un cierto patron
+'''
+
+def ganar(matriz, jugador):
+    # Horizontal
+    for fila in range(matriz.shape[0]):
+        for columna in range(matriz.shape[1] - 3):
+            if all(matriz[fila, columna + i] == jugador for i in range(4)):
                 return True
 
-    # Check for vertical wins
-    for col in range(board.shape[1]):
-        for row in range(board.shape[0] - 3):
-            if all(board[row + i, col] == player for i in range(4)):
+    # Vertical
+    for columna in range(matriz.shape[1]):
+        for fila in range(matriz.shape[0] - 3):
+            if all(matriz[fila + i, columna] == jugador for i in range(4)):
                 return True
 
-    # Check for diagonal wins (from top-left to bottom-right)
-    for row in range(board.shape[0] - 3):
-        for col in range(board.shape[1] - 3):
-            if all(board[row + i, col + i] == player for i in range(4)):
+    # Diagonal a la izquierda
+    for fila in range(matriz.shape[0] - 3):
+        for columna in range(matriz.shape[1] - 3):
+            if all(matriz[fila + i, columna + i] == jugador for i in range(4)):
                 return True
 
-    # Check for diagonal wins (from top-right to bottom-left)
-    for row in range(board.shape[0] - 3):
-        for col in range(3, board.shape[1]):
-            if all(board[row + i, col - i] == player for i in range(4)):
+    # Diagonal a la derecha
+    for fila in range(matriz.shape[0] - 3):
+        for columna in range(3, matriz.shape[1]):
+            if all(matriz[fila + i, columna - i] == jugador for i in range(4)):
                 return True
 
     return False
 
+'''
+Funcion empate
+Retorna true si toda la matriz esta ocupada, y falso si hay algun 0
+
+Revisa matriz por si existe algun 0 en un espacio
+'''
+
+def empate(matriz):
+    return np.all(matriz != "0")
+
+
+
 
 while True:
-    if flag == False:
+
+    if flag == False: #Se ejecuta una sola vez para aceptar conexion con cliente y con servidor go
         conexion, addr = mi_socket.accept()
         print("Nueva conexion establecida")
         print(addr)
@@ -78,7 +98,7 @@ while True:
     jugada = peticion2.decode('utf-8')
     
 
-    
+    #A partir de la jugada recibida, lo ingresa al tablero
 
     if jugada == '1':
         
@@ -121,9 +141,13 @@ while True:
         if fila >= 0:
             tablero[fila][5] = 'A'
     
+    #Si las funciones retorna true se activan flags
+    if empate(tablero):
+        print("Hay un empate")
+        mensaje = '5'
+        draw = True
 
-
-    if check_win(tablero, 'A'):
+    if ganar(tablero, 'A'):
         print("Gana cliente")
         mensaje = '3'
         win = True
@@ -131,12 +155,13 @@ while True:
     
 
     #Puerto dinamico
+
     puerto = mi_socket2.recv(1024).decode('utf-8')  #Recibo puerto del go
     print(f"Mensaje recibido de conecta4 {address}: {data.decode('utf-8')}")
     print("Puerto a usar: "+puerto)
 
     if jugada == "cerrar": #En caso de no querer continuar el juego
-        socketDinamico = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        socketDinamico = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Creo un socket dinamico que manda un mensaje y se cierra
         socketDinamico.connect(('127.0.0.1', int(puerto)))
         socketDinamico.send(jugada.encode('utf-8'))
         print("Mensaje enviado al servidor conecta 4: ",jugada)
@@ -150,9 +175,8 @@ while True:
         
     #Abrimos socket con puerto dinamico
 
-    socketDinamico = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    socketDinamico = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Se crea socket dinamico que manda un mensaje al servidor go y se cierra
     socketDinamico.connect(('127.0.0.1', int(puerto)))
-
 
     socketDinamico.send(jugada.encode('utf-8'))
     print("Mensaje enviado al servidor conecta 4: ",jugada)
@@ -160,7 +184,7 @@ while True:
     
     
         
-    jugadago = socketDinamico.recv(1024).decode('utf-8')
+    jugadago = socketDinamico.recv(1024).decode('utf-8') #Se almacena jugada del go
     print(f"Jugada recibido de conecta4: "+jugadago)  #Recibe jugada del go    
 
     socketDinamico.close()
@@ -168,7 +192,7 @@ while True:
 
     ##Incorpora ficha del bot a el tablero
     fila = 5
-    if win == False:
+    if win == False and draw == False:
         if jugadago== '0':
             
             while tablero[fila][0] != '0' and fila >= 0:
@@ -213,15 +237,14 @@ while True:
 
     print(tablero)
 
-    tablero_bytes = pickle.dumps(tablero)
+    tablero_bytes = pickle.dumps(tablero) #Comprime tablero en bytes
     conexion.send(tablero_bytes)  #Mandamos tablero actualizado al cliente
     print("Tablero enviado al cliente")
     
 
     #Checkeamos ganador
-    if win == True:
+    if win == True:  #Si flag esta activa, se manda senal 3 a cliente y se terminan procesos
         mensaje = '3'
-        conexion.send(mensaje.encode('utf-8'))
         jugada = "cerrar"
         puerto = mi_socket2.recv(1024).decode('utf-8')  #Recibo puerto del go
         print("Puerto a usar para enviar mensaje es:"+puerto)
@@ -229,6 +252,7 @@ while True:
         socketDinamico.connect(('127.0.0.1', int(puerto)))
         socketDinamico.send(jugada.encode('utf-8'))
         print("Mensaje enviado al servidor conecta 4: ",jugada)
+        conexion.send(mensaje.encode('utf-8'))
 
         socketDinamico.close()
         conexion.close()
@@ -237,8 +261,25 @@ while True:
         break
 
 
-    
-    if check_win(tablero, 'M'):
+    if draw == True: #Senal activa de empate
+        mensaje = '5'
+        jugada = "cerrar"
+        puerto = mi_socket2.recv(1024).decode('utf-8')  #Recibo puerto del go
+        print("Puerto a usar para enviar mensaje es:"+puerto)
+        socketDinamico = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        socketDinamico.connect(('127.0.0.1', int(puerto)))
+        socketDinamico.send(jugada.encode('utf-8'))
+        print("Mensaje enviado al servidor conecta 4: ",jugada)
+        conexion.send(mensaje.encode('utf-8'))
+
+        socketDinamico.close()
+        conexion.close()
+        mi_socket2.close()
+        mi_socket.close()
+        break
+
+
+    if ganar(tablero, 'M'):  #Ganador es el bot
         print("Gana bot")
         mensaje = '4'
         conexion.send(mensaje.encode('utf-8'))
@@ -257,31 +298,12 @@ while True:
 
         break
 
-    else:
-        mensaje = '5'
+    else:  #Se manda un mensaje que no activa nada en el lado del cliente para suplir receive tcp
+        mensaje = '6'
         conexion.send(mensaje.encode('utf-8'))
 
 
-    
 
-    
-    
-    
-'''   
-    mensaje = "Hola, te saludo desde el servidor!"
-    mensaje_bytes = mensaje.encode('utf-8')
-    conexion.send(mensaje_bytes)
-    
-    
-    mensaje2 = "Hola, servidor go!"
-    mi_socket2.sendto(mensaje2.encode('utf-8'), ('127.0.0.1', 1234))
-    
-    data, address = mi_socket2.recvfrom(1024)
-    print(f"Mensaje recibido de {address}: {data.decode('utf-8')}")
-    
-    conexion.close()
-    mi_socket2.close()
-'''
     
 
     
