@@ -277,15 +277,3 @@ func main() {
 	}
 
 }
-
-// Rutina del cliente para enviar datos
-// message := "¡Hola, servidor de python!"
-
-//messageBytes := []byte(message)
-
-//_, err = conn.WriteToUDP(messageBytes, addr)
-//if err != nil {
-//fmt.Println("Error al enviar datos al servidor:", err)
-//return
-//}
-//fmt.Printf("Datos enviados al servidor: %s\n", message)
