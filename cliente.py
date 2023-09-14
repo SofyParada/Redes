@@ -16,11 +16,11 @@ if Seleccion == '1': #arreglar los if por ok y no
     print("- - - - - - - - Comienza el Juego - - - - - - - -")
     
     tablero = np.array([['0','0','0','0','0','0'], 
-               ['0','0','0','0','0','0'], 
-               ['0','0','0','0','0','0'],
-               ['0','0','0','0','0','0'],
-               ['0','0','0','0','0','0'],
-               ['0','0','0','0','0','0']])
+                        ['0','0','0','0','0','0'], 
+                        ['0','0','0','0','0','0'],
+                        ['0','0','0','0','0','0'],
+                        ['0','0','0','0','0','0'],
+                        ['0','0','0','0','0','0']])
     print("Tablero inicial:\n",tablero)
     
     #Las fichas azules seran del jugador y su variable sera A
@@ -32,9 +32,10 @@ if Seleccion == '1': #arreglar los if por ok y no
     columna = 0
     flag = False
 
-    while flag == False:
+    #Comienza while loop para que no se pierda la conexion despues de una iteracion
+    while flag == False: 
 
-        while flag == False:
+        while flag == False:  #A partir del input, reviso si jugada es valida segun tablero
             fila = 5
             jugada = input("En que columna quieres color tu ficha: ")
             if jugada == '1':
@@ -108,18 +109,20 @@ if Seleccion == '1': #arreglar los if por ok y no
                 flag = False
         
 
+        #Se toma la jugada y se manda a el intermediario 
+
         fila_str = str(jugada)
-        fila_bytes = fila_str.encode('utf-8')  #Jugador manda fila a intermediario
+        fila_bytes = fila_str.encode('utf-8')  #Jugador manda columna a intermediario
         mi_socket.send(fila_bytes)
         
 
         tablero_bytes = (mi_socket.recv(4096))  #Cliente recibe tablero actualizado
-        newtablero = pickle.loads(tablero_bytes)
+        newtablero = pickle.loads(tablero_bytes) #Descomprime tablero
         
         print("El nuevo tablero es:\n")
         print(newtablero)
 
-        mensaje = mi_socket.recv(1024).decode('utf-8')
+        mensaje = mi_socket.recv(1024).decode('utf-8')  #Mensaje que establece si el juego termina, segun senal recibida
 
         if mensaje == '3':
             print("Termina el juego, gana el cliente")
@@ -138,7 +141,15 @@ if Seleccion == '1': #arreglar los if por ok y no
             flag = False
             break
 
-        while flag == True:
+        if mensaje == '5':
+            print("No hay mas espacio para jugar, hay un empate, termina el juego")
+            End = "cerrar"
+            End_bytes = End.encode('utf-8')
+            mi_socket.close()
+            flag = False
+            break
+
+        while flag == True:  #En cada turno pregunta si quiere seguir jugando o terminar el proceso
             Continue = input("Quiere seguir jugando? Si/No\n")
             if Continue == "Si" or Continue == "si":
                 flag = False
@@ -147,15 +158,15 @@ if Seleccion == '1': #arreglar los if por ok y no
                 break
             
 
-    if flag == True:
+    if flag == True:  #Termina procesos
         End = "cerrar"
         End_bytes = End.encode('utf-8')
         mi_socket.send(End_bytes)
         mi_socket.close()
+        exit(1)
     
     
-    
-if Seleccion == "cerrar":
+if Seleccion == "cerrar":  #Ante la palabra cerrar, termina procesos
     
     Seleccion_bytes = Seleccion.encode('utf-8')
     mi_socket.send(Seleccion_bytes)
@@ -164,14 +175,3 @@ if Seleccion == "cerrar":
     print("Respuesta de disponibilidad: ", respuesta)
     mi_socket.close()    
 
-'''
-mensaje = "Hola, te saludo desde el cliente!"
-mensaje_bytes = mensaje.encode('utf-8')
-
-mi_socket.send(mensaje_bytes)
-respuesta = mi_socket.recv(1024)
-
-print(respuesta)
-mi_socket.close()
-    
-'''
