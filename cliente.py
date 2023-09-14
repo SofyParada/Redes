@@ -37,7 +37,7 @@ if Seleccion == '1': #arreglar los if por ok y no
 
         while flag == False:  #A partir del input, reviso si jugada es valida segun tablero
             fila = 5
-            jugada = input("En que columna quieres color tu ficha: ")
+            jugada = input("En que columna quieres colocar tu ficha: ")
             if jugada == '1':
                 
                 while tablero[fila][0] != '0' and fila >= 0:
